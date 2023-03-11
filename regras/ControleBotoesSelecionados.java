@@ -1,56 +1,72 @@
-package telas;
+package regras;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import regras.ControleBotoesSelecionados;
-import regras.EstadosBotoes;
+public class ControleBotoesSelecionados {
+    private String botao;
+    private Map<JButton, EstadosBotoes> referenciasBotoes;
 
-public class TelaPrincipal extends JFrame {
-    private JPanel painel;
-    private JButton botao1;
-    private JButton botao2;
-    private ControleBotoesSelecionados controle;
-
-    public TelaPrincipal(){
-        super("Jogo da Memória");
-
-        controle = new ControleBotoesSelecionados();
-
-        painel = new JPanel();
-        this.add(painel);
-        painel.setLayout(null);
-
-        botao1 = new JButton("Açaí");
-        painel.add(botao1);
-        botao1.setBounds(10, 10, 100, 100);
-
-        botao1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //((JButton) e.getSource()).setBackground(Color.pink);
-                controle.setBotao("Jogo");
-                controle.alterarSelecao((JButton) e.getSource(), EstadosBotoes.SELECIONADO);
-                //((JButton) e.getSource()).setText(controle.getBotao());
-            }
-        });
-
-        botao2 = new JButton("Coxinha");
-        painel.add(botao2);
-        botao2.setBounds(120, 10, 100, 100);
-        this.setBounds(250, 100, 350, 350);
-
-        this.controle.adicionarBotao(botao1);
-        this.controle.adicionarBotao(botao2);
-
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
+    public ControleBotoesSelecionados(){
+        this.referenciasBotoes = new HashMap<>();
     }
 
+    public String getBotao(){
+        return botao;
+    }
 
+    public void setBotao(String botao){
+        this.botao = botao;
+    }
+
+    public Map<JButton, EstadosBotoes> getReferenciasBotoes(){
+        return referenciasBotoes;
+    }
+
+    public void setReferenciasBotoes(Map<JButton, EstadosBotoes> referenciasBotoes){
+        this.referenciasBotoes = referenciasBotoes;
+    }
+
+    public void adicionarBotao(JButton botao){
+        this.referenciasBotoes.put(botao, EstadosBotoes.NORMAL);
+    }
+
+    public void alterarSelecao(JButton botao, EstadosBotoes selecionado) {
+        EstadosBotoes n = this.referenciasBotoes.get(botao);
+        EstadosBotoes b = selecionado;
+        alterarVisualizacaoBotao(botao);
+    }
+
+    private void alterarVisualizacaoBotao(JButton botao){
+        EstadosBotoes selecionado = this.referenciasBotoes.get(botao);
+        switch (selecionado){
+            case NORMAL: // Cinza, não exibe texto
+                botao.setBackground(null);
+                botao.setText("Jogo");
+                break;
+            case SELECIONADO: // Exibir texto, mudar a cor
+                botao.setBackground(Color.pink);
+                botao.setText(this.botao);
+                break;
+            case PARES_ENCONTRADOS: // Mudar a cor, exibir o texto
+                botao.setBackground(Color.MAGENTA);
+                botao.setText(this.botao);
+                break;
+        }
+    }
+    public void zerarSelecoes(){
+        this.referenciasBotoes.values().stream().forEach((b) -> {
+            b = EstadosBotoes.NORMAL;
+        });
+    }
+    public Boolean isTodasSelecionadas(){
+        for(EstadosBotoes b : this.referenciasBotoes.values()){
+            if(b != EstadosBotoes.SELECIONADO){
+                return false;
+            }
+        }
+        return true;
+    }
 }
